@@ -1,5 +1,5 @@
 CC := g++
-CFLAGS := -std=c++11 -Wall
+CFLAGS := -g -Wall -std=c++17
 
 #TARGET Executables
 TARGETS := client serverM serverEE serverCE
