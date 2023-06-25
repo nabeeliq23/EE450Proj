@@ -4,26 +4,26 @@ BUILD_DIR := build
 
 #TARGET Executables
 TARGETS := client serverM serverEE serverCE
-TARGETS_BUILD := $(addprefix $(BUILD_DIR)/,$(TARGETS))
+TARGETS_BUILD := $(TARGETS)
 
 # Default Target
 all: $(TARGETS_BUILD)
 
 # Compile client
-$(BUILD_DIR)/client: src/client.cpp
-	$(CC) $(CFLAGS) src/client.cpp -o $(BUILD_DIR)/client
+client: client.cpp
+	$(CC) $(CFLAGS) client.cpp -o client
 
 # Compile Main Server
-$(BUILD_DIR)/serverM: src/serverM.cpp src/helperFuncs.h
-	$(CC) $(CFLAGS) src/serverM.cpp -o $(BUILD_DIR)/serverM
+serverM: serverM.cpp helperFuncs.h
+	$(CC) $(CFLAGS) serverM.cpp -o serverM
 
 # Compile EE Backend
-$(BUILD_DIR)/serverEE: src/serverEE.cpp src/helperFuncs.h
-	$(CC) $(CFLAGS) src/serverEE.cpp -o $(BUILD_DIR)/serverEE
+serverEE: serverEE.cpp helperFuncs.h
+	$(CC) $(CFLAGS) serverEE.cpp -o serverEE
 
 # Compile CE Backend
-$(BUILD_DIR)/serverCE: src/serverCE.cpp src/helperFuncs.h
-	$(CC) $(CFLAGS) src/serverCE.cpp -o $(BUILD_DIR)/serverCE
+serverCE: serverCE.cpp helperFuncs.h
+	$(CC) $(CFLAGS) serverCE.cpp -o serverCE
 
 # Clean generated
 clean: 
