@@ -17,7 +17,12 @@
 const int MAIN_SERVER_UDP_PORT = 23370;
 const int CE_SERVER_UDP_PORT = 21370; 
 
+using namespace std;
+
 int main() {
+
+    std::string filename = "CE.txt";
+    std::map<std::string, std::vector<std::vector<int>>> data = readInput("CE.txt"); 
     
     // Create UDP socket
     int udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -44,10 +49,18 @@ int main() {
     serverAddress.sin_family = AF_INET; 
     serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
     serverAddress.sin_port = htons(MAIN_SERVER_UDP_PORT);
-
-    //Send data to the server
-    std::string message = "Hello from CE server!";
-    if(sendto(udpSocket, message.c_str(), message.size(), 0,
+    
+    string names = "";
+    map<string,vector<vector<int>>> :: iterator it;
+    for(it = data.begin(); it != data.end(); it++){
+        if(it != data.end()){
+            names += it->first + " ";
+        } else {
+            names += it->first;
+        }
+    }
+    //cout << names << endl;
+    if(sendto(udpSocket, names.c_str(), names.size(), 0,
     (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
         std::cerr << "Failed to send UDP data." << std::endl; 
         close(udpSocket); 
