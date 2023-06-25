@@ -19,6 +19,8 @@ const int BUFFER_SIZE = 1024;
 
 int main() {
      
+     std::cout << "Main server is up and running." << std::endl; 
+
     //Create TCP socket
     int tcpSocket = socket(AF_INET, SOCK_STREAM, 0); 
     if(tcpSocket == -1){
@@ -59,11 +61,11 @@ int main() {
     }
 
     //Recieve and print UDP data from client 1
-    char udpBuffer1[BUFFER_SIZE]; 
-    memset(udpBuffer1, 0, sizeof(udpBuffer1));
+    char CEnames[BUFFER_SIZE]; 
+    memset(CEnames, 0, sizeof(CEnames));
     sockaddr_in senderAddress1{}; 
     socklen_t senderAddressLength1 = sizeof(senderAddress1);
-    ssize_t udpBytesReceived1 = recvfrom(udpSocket, udpBuffer1, sizeof(udpBuffer1), 0, 
+    ssize_t udpBytesReceived1 = recvfrom(udpSocket, CEnames, sizeof(CEnames), 0, 
                                 (struct sockaddr *)&senderAddress1, &senderAddressLength1);
 
     if (udpBytesReceived1 == -1){
@@ -71,14 +73,15 @@ int main() {
         return 1; 
     }
 
-    std::cout << "UDP Data from client 1: " << udpBuffer1 << std::endl; 
+    std::cout << "Main server received names from server CE using UDP" 
+                 " over Port " + std::to_string(MAIN_SERVER_UDP_PORT) << std::endl; 
 
     //Receive and print UDP data from client 2
-    char udpBuffer2[BUFFER_SIZE]; 
-    memset(udpBuffer2, 0, sizeof(udpBuffer2));
+    char EEnames[BUFFER_SIZE]; 
+    memset(EEnames, 0, sizeof(EEnames));
     sockaddr_in senderAddress2{}; 
     socklen_t senderAddressLength2 = sizeof(senderAddress2);
-    ssize_t udpBytesReceived2 = recvfrom(udpSocket, udpBuffer2, sizeof(udpBuffer2), 0, 
+    ssize_t udpBytesReceived2 = recvfrom(udpSocket, EEnames, sizeof(EEnames), 0, 
                                 (struct sockaddr *)&senderAddress2, &senderAddressLength2);
 
     if (udpBytesReceived2 == -1){
@@ -86,7 +89,8 @@ int main() {
         return 1; 
     }
 
-    std::cout << "UDP Data from client 2: " << udpBuffer2 << std::endl;
+    std::cout << "Main server received names from server EE using UDP" 
+                 " over Port " + std::to_string(MAIN_SERVER_UDP_PORT) << std::endl;
 
 
     // Listen for incoming connections

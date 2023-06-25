@@ -21,6 +21,11 @@ using namespace std;
 
 int main() {
 
+    std::cout << "ServerCE is up and running using UDP " 
+                 "on Port " + std::to_string(CE_SERVER_UDP_PORT) << 
+                  std::endl; 
+
+    // Read in Data
     std::string filename = "CE.txt";
     std::map<std::string, std::vector<std::vector<int>>> data = readInput("CE.txt"); 
     
@@ -50,6 +55,7 @@ int main() {
     serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
     serverAddress.sin_port = htons(MAIN_SERVER_UDP_PORT);
     
+    // Convert names to a single string
     string names = "";
     map<string,vector<vector<int>>> :: iterator it;
     for(it = data.begin(); it != data.end(); it++){
@@ -59,7 +65,8 @@ int main() {
             names += it->first;
         }
     }
-    //cout << names << endl;
+    
+    // Send names
     if(sendto(udpSocket, names.c_str(), names.size(), 0,
     (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
         std::cerr << "Failed to send UDP data." << std::endl; 
@@ -67,14 +74,11 @@ int main() {
         return 1; 
     }
 
-    std::cout << "Send CE data to the server." << std::endl; 
+    std::cout << "ServerCE  finished  sending  a  list  of "
+                 "usernames  to  Main  Server. " << std::endl;  
 
     // Close the UDP Socket
     close(udpSocket); 
-
-
-
-
 
     // std::string filename = "CE.txt";
     // std::map<std::string, std::vector<std::vector<int>>> data = readInput(filename); 
