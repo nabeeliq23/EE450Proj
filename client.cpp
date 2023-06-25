@@ -70,14 +70,14 @@ int main() {
 
 
     //Continue asking users for input
-   // while(keepRunning) {
+    while(1) {
         //Send request to main server
         std::string request;
         std::cout << "Please enter the usernames to check the common course selection:";
         std::getline(std::cin, request);
-        // if(request.empty()){
-        //     continue;
-        // }
+        if(request.empty()){
+            continue;
+        }
 
         send(clientSocket, request.c_str(), request.size(), 0);
 
@@ -86,7 +86,7 @@ int main() {
         int bytesRead = read(clientSocket, buffer, 1024);
         std::cout << "Response from main server: " << buffer << std::endl;
 
-    //}
+    }
 
     return 0;
 }

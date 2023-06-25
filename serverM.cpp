@@ -59,24 +59,24 @@ int main() {
 
     std::cout << "Client connected." << std::endl; 
 
-   // while(keepRunning){
-    //Client Request
-    char buffer[1024] = {0}; 
-    int bytesRead = read(clientSocket, buffer, 1024); 
+   while(1){
+        //Client Request
+        char buffer[1024] = {0}; 
+        int bytesRead = read(clientSocket, buffer, 1024); 
 
-    //Process client request
-    std::string response; 
-    if(bytesRead > 0){
-        std::string request(buffer); 
-        response = "Recieved request: " + request; 
-        std::cout << "Received request from client: " << request << std::endl; 
-    } else {
-        response = "Error: Failed to read client message";
-    }
-    // Send the response to the client
-    send(clientSocket, response.c_str(), response.size(), 0); 
-    std::cout << "Sent response" << std::endl;
-   // } 
+        //Process client request
+        std::string response; 
+        if(bytesRead > 0){
+            std::string request(buffer); 
+            response = "Recieved request: " + request; 
+            std::cout << "Received request from client: " << request << std::endl; 
+        } else {
+            response = "Error: Failed to read client message";
+        }
+        // Send the response to the client
+        send(clientSocket, response.c_str(), response.size(), 0); 
+        std::cout << "Sent response" << std::endl;
+   } 
 
     return 0;
 }
