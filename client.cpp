@@ -12,22 +12,10 @@
 #include  <sys/wait.h>
 #include  <signal.h>
 
-#define MAIN_SERVER_PORT 24370
+const int MAIN_SERVER_PORT = 24370; 
 #define MAIN_SERVER_IP "127.0.0.1"
 
-// bool keepRunning = true;
-
-// void signalHandler(int signum){
-//     if(signum == SIGINT){
-//         keepRunning = false;
-//         close(clientSocket);
-//     }
-// }
-
 int main() {
-
-    // Signal Handler to exit on Ctrl+C
-    // signal(SIGINT, signalHandler);
 
     // Create a TCP connection
     int clientSocket = socket(AF_INET, SOCK_STREAM, 0);

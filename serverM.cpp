@@ -1,5 +1,4 @@
 #include <iostream>
-#include <iostream>
 #include  <stdio.h>
 #include  <stdlib.h>
 #include  <unistd.h>
@@ -13,33 +12,85 @@
 #include  <sys/wait.h>
 #include  <signal.h>
 
-#define MAIN_SERVER_PORT 24370
-
-// bool keepRunning = true; 
+const int MAIN_SERVER_UDP_PORT = 23370;
+const int MAIN_SERVER_TCP_PORT = 24370;
+const int BUFFER_SIZE = 1024;
+  
 
 int main() {
      
     //Create TCP socket
-    int serverSocket = socket(AF_INET, SOCK_STREAM, 0); 
-    if(serverSocket == -1){
+    int tcpSocket = socket(AF_INET, SOCK_STREAM, 0); 
+    if(tcpSocket == -1){
         std::cerr << "Failed to create socket." << std::endl; 
         return 1; 
     }
 
-    //Setup Server Address 
-    sockaddr_in serverAddress{}; 
-    serverAddress.sin_family = AF_INET; 
-    serverAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
-    serverAddress.sin_port = htons(MAIN_SERVER_PORT); 
+    //Create UDP socket
+    int udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
+    if(udpSocket == -1){
+        std::cerr << "Failed to create UDP socket." << std::endl; 
+        return 1; 
+    }
+
+    //Setup TCP Server Address 
+    sockaddr_in tcpAddress{}; 
+    tcpAddress.sin_family = AF_INET; 
+    tcpAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
+    tcpAddress.sin_port = htons(MAIN_SERVER_TCP_PORT); 
+
+    //Setup UDP Server Address 
+    sockaddr_in udpAddress{}; 
+    udpAddress.sin_family = AF_INET; 
+    udpAddress.sin_addr.s_addr = inet_addr("127.0.0.1");
+    udpAddress.sin_port = htons(MAIN_SERVER_UDP_PORT);
+
 
     //Bind Socket to the specified Address
-    if(bind(serverSocket, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
+    if(bind(tcpSocket, (struct sockaddr *)&tcpAddress, sizeof(tcpAddress)) < 0){
         std::cerr << "Binding failed." << std::endl; 
         return 1; 
     }
 
+    //Bind Socket to the specified Address
+    if(bind(udpSocket, (struct sockaddr *)&udpAddress, sizeof(udpAddress)) < 0){
+        std::cerr << "Binding failed." << std::endl; 
+        return 1; 
+    }
+
+    //Recieve and print UDP data from client 1
+    char udpBuffer1[BUFFER_SIZE]; 
+    memset(udpBuffer1, 0, sizeof(udpBuffer1));
+    sockaddr_in senderAddress1{}; 
+    socklen_t senderAddressLength1 = sizeof(senderAddress1);
+    ssize_t udpBytesReceived1 = recvfrom(udpSocket, udpBuffer1, sizeof(udpBuffer1), 0, 
+                                (struct sockaddr *)&senderAddress1, &senderAddressLength1);
+
+    if (udpBytesReceived1 == -1){
+        std::cerr << "Failed to receive UDP data from client 1." << std::endl;
+        return 1; 
+    }
+
+    std::cout << "UDP Data from client 1: " << udpBuffer1 << std::endl; 
+
+    //Receive and print UDP data from client 2
+    char udpBuffer2[BUFFER_SIZE]; 
+    memset(udpBuffer2, 0, sizeof(udpBuffer2));
+    sockaddr_in senderAddress2{}; 
+    socklen_t senderAddressLength2 = sizeof(senderAddress2);
+    ssize_t udpBytesReceived2 = recvfrom(udpSocket, udpBuffer2, sizeof(udpBuffer2), 0, 
+                                (struct sockaddr *)&senderAddress2, &senderAddressLength2);
+
+    if (udpBytesReceived2 == -1){
+        std::cerr << "Failed to receive UDP data from client 2." << std::endl;
+        return 1; 
+    }
+
+    std::cout << "UDP Data from client 2: " << udpBuffer2 << std::endl;
+
+
     // Listen for incoming connections
-    if(listen(serverSocket, 1) < 0){
+    if(listen(tcpSocket, 1) < 0){
         std::cerr << "Listening Failed." << std::endl; 
     }
 
@@ -50,10 +101,10 @@ int main() {
     sockaddr_in clientAddress{}; 
     socklen_t clientAddressLength = sizeof(clientAddress); 
 
-    clientSocket = accept(serverSocket, (struct sockaddr *)&clientAddress, &clientAddressLength);
+    clientSocket = accept(tcpSocket, (struct sockaddr *)&clientAddress, &clientAddressLength);
     if(clientSocket < 0){
         std::cerr << "Failed to accept client connection." << std::endl; 
-        close(serverSocket); 
+        close(tcpSocket); 
         return 1; 
     }
 
