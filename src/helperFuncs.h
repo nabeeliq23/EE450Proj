@@ -78,12 +78,7 @@ std::map<std::string, std::vector<std::vector<int>>> readInput(std::string fileN
         }
 
         dataMap[name] = intervals; 
-    }
-
-
-
-
-         
+    }     
 
     return dataMap; 
 }
@@ -105,5 +100,23 @@ void printData(std::map<std::string, std::vector<std::vector<int>>> dataMap){
 
 
 bool classOverlap(std::vector<std::vector<int>> stud1, std::vector<std::vector<int>> stud2){
+       
+       for(const auto& interval1 : stud1){
+        
+        int start = interval1[0];
+        int end   = interval1[1];
+        
+        while(start <= end){
+            
+            for(const auto& interval2 : stud2){
+                if(interval2[0] <= start && interval2[1] >= start){
+                    return true; 
+                }
+            }
+            
+            start++; 
+        }
+    } 
+    
     return false; 
 }
