@@ -11,6 +11,8 @@
 #include  <arpa/inet.h>
 #include  <sys/wait.h>
 #include  <signal.h>
+#include  <vector>
+#include "helperFuncs.h"
 
 const int MAIN_SERVER_UDP_PORT = 23370;
 const int MAIN_SERVER_TCP_PORT = 24370;
@@ -76,6 +78,9 @@ int main() {
     std::cout << "Main server received names from server CE using UDP" 
                  " over Port " + std::to_string(MAIN_SERVER_UDP_PORT) << std::endl; 
 
+    std::string CEnames1 = CEnames; 
+    std::vector<std::string> CEserverNames = splitString(CEnames1, " ");   
+
     //Receive and print UDP data from client 2
     char EEnames[BUFFER_SIZE]; 
     memset(EEnames, 0, sizeof(EEnames));
@@ -92,6 +97,8 @@ int main() {
     std::cout << "Main server received names from server EE using UDP" 
                  " over Port " + std::to_string(MAIN_SERVER_UDP_PORT) << std::endl;
 
+    std::string EEnames1 = EEnames; 
+    std::vector<std::string> EEserverNames = splitString(EEnames1, " ");
 
     // Listen for incoming connections
     if(listen(tcpSocket, 1) < 0){
@@ -114,23 +121,44 @@ int main() {
 
     std::cout << "Client connected." << std::endl; 
 
-   while(1){
-        //Client Request
-        char buffer[1024] = {0}; 
-        int bytesRead = read(clientSocket, buffer, 1024); 
+    //Init Variables
+    char tcpBuffer[BUFFER_SIZE];
+    ssize_t tcpBytesReceived; 
+    std::string clientNames;
+    std::vector<std::string> studNames;
+    std::string CEsend = ""; 
+    std:: string EEsend = "";
 
-        //Process client request
-        std::string response; 
-        if(bytesRead > 0){
-            std::string request(buffer); 
-            response = "Recieved request: " + request; 
-            std::cout << "Received request from client: " << request << std::endl; 
-        } else {
-            response = "Error: Failed to read client message";
+   while(1){
+        
+        memset(tcpBuffer, 0, sizeof(tcpBuffer)); 
+        tcpBytesReceived = recv(clientSocket, tcpBuffer, sizeof(tcpBuffer), 0); 
+        if(tcpBytesReceived == -1){
+            std::cerr << "Failed to receive TCP data." << std::endl; 
+            return 1; 
         }
-        // Send the response to the client
-        send(clientSocket, response.c_str(), response.size(), 0); 
-        std::cout << "Sent response" << std::endl;
+        
+        //Take client name and seperate into two
+        clientNames = tcpBuffer; 
+        studNames   = splitString(clientNames, " ");
+
+        for(int i = 0; i < studNames.size(); i++){
+            std::string currName = studNames[i]; 
+
+            if(std::find(CEserverNames.begin, CEServerNames.end(), currName)!= CEserverNames.end()){
+                CEsend += currName + " "; 
+            }
+
+            if(std::find(EEserverNames.begin, EEserverNames.end(), currName)!= EEserverNames.end()){
+                EEsend += currName + " "; 
+            }
+
+        }
+        
+        
+
+        std::cout << "TCP Data: " << tcpBuffer << std::endl; 
+        
    } 
 
     return 0;
