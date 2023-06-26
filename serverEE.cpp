@@ -15,6 +15,7 @@
 
 #define MAIN_SERVER_UDP_PORT 23370
 #define EE_SERVER_UDP_PORT 22370
+const int BUFFER_SIZE = 1024;
 
 using namespace std; 
 
@@ -76,10 +77,25 @@ int main() {
     std::cout << "ServerEE  finished  sending  a  list  of "
                  "usernames  to  Main  Server. " << std::endl;  
 
+
+    while(1){
+        char EEnames[BUFFER_SIZE]; 
+        memset(EEnames, 0, sizeof(EEnames));
+        sockaddr_in senderAddress{}; 
+        socklen_t senderAddressLength = sizeof(senderAddress);
+        ssize_t udpBytesReceived = recvfrom(udpSocket, EEnames, sizeof(EEnames), 0, 
+                                (struct sockaddr *)&senderAddress, &senderAddressLength);
+
+        if (udpBytesReceived == -1){
+            std::cerr << "Failed to receive UDP data from client 2." << std::endl;
+            return 1; 
+        }
+        cout << "Names receieved from main server: " << EEnames << endl;
+        return 1; 
+    }
+
     // Close the UDP Socket
-    close(udpSocket);
-
-
+    close(udpSocket); 
 
     return 0;
 }

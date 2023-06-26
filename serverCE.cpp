@@ -92,6 +92,7 @@ int main() {
             return 1; 
         }
         cout << "Names receieved from main server: " << CEnames << endl;
+        return 1; 
     }
 
     // Close the UDP Socket

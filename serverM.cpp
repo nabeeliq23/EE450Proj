@@ -156,6 +156,7 @@ int main() {
             }
 
         }
+        
         // Names does not exist in either Server
         if(CEsend == "" && EEsend == ""){
             std::string response = "does not exist";
@@ -163,49 +164,50 @@ int main() {
                 std::cerr << "Failed to send UDP response." << std::endl;
                 return 1;
             }
-        } 
-        //std::cout << "after empty list" << std::endl;
-        if(sendto(udpSocket, CEsend.c_str(), CEsend.size(), 0,
-                (struct sockaddr *)&senderAddress1, senderAddressLength1) < 0){
-                std::cerr << "Failed to send UDP data. [CEserver]" << std::endl; 
-                close(udpSocket); 
-                return 1; 
-        }
-        /*
-        //Names getting sent to serverCE
-        else if(CEsend != ""){
-            std::string response1 = "Found ... located at ServerCE. Send to ServerCE";
-            if(send(clientSocket, response1.c_str(),response1.size(), 0) == -1){
-                std::cerr << "Failed to send UDP response." << std::endl;
-                return 1;
-            }
-            //int num = sendto(udpSocket, CEsend.c_str(), CEsend.size(), 0,
-                //(struct sockaddr *)&senderAddress1, sizeof(senderAddressLength1));
+        } else if(CEsend != "" && EEsend != ""){
+            std::cout << "Found " << CEsend << "located at server CE." << 
+            std::endl << "Send to Server CE.";
+            std::cout << "Found " << EEsend << "located at server EE." << 
+            std::endl << "Send to Server EE.";  
+
             if(sendto(udpSocket, CEsend.c_str(), CEsend.size(), 0,
                 (struct sockaddr *)&senderAddress1, senderAddressLength1) < 0){
                 std::cerr << "Failed to send UDP data. [CEserver]" << std::endl; 
-                //std::cerr << "Error message: " << gai_strerror(num) << std::endl;
                 close(udpSocket); 
                 return 1; 
             }
-        } 
-        /*
-        //Names getting sent to serverEE
-        else if (EEsend != "") {
-            std::string response2 = "Found ... located at ServerEE. Send to ServerEE";
-            if(send(clientSocket, response2.c_str(),response2.size(), 0) == -1){
-                std::cerr << "Failed to send UDP response." << std::endl;
-                return 1;
-            }
+
             if(sendto(udpSocket, EEsend.c_str(), EEsend.size(), 0,
-                (struct sockaddr *)&senderAddress2, sizeof(senderAddressLength2)) < 0){
+                (struct sockaddr *)&senderAddress2, senderAddressLength2) < 0){
+                std::cerr << "Failed to send UDP data. [EEserver]" << std::endl; 
+                close(udpSocket); 
+                return 1; 
+            }
+
+        } else if(CEsend != ""){
+            std::cout << "Found " <<  CEsend << 
+            " located at server CE. Send to Server CE" << std::endl;
+            
+            if(sendto(udpSocket, CEsend.c_str(), CEsend.size(), 0,
+                (struct sockaddr *)&senderAddress1, senderAddressLength1) < 0){
+                std::cerr << "Failed to send UDP data. [CEserver]" << std::endl; 
+                close(udpSocket); 
+                return 1; 
+            }
+         
+        } else if (EEsend != "") {
+            std::cout << "Found " <<  EEsend << 
+            " located at server EE. Send to Server EE" << std::endl;
+
+            if(sendto(udpSocket, EEsend.c_str(), EEsend.size(), 0,
+                (struct sockaddr *)&senderAddress2, senderAddressLength2) < 0){
                 std::cerr << "Failed to send UDP data. [EEserver]" << std::endl; 
                 close(udpSocket); 
                 return 1; 
             }
         }
         
-        */
+        
         std::cout << "TCP Data: " << tcpBuffer << std::endl; 
         
    } 
