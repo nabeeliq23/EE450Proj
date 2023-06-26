@@ -16,6 +16,7 @@
 
 const int MAIN_SERVER_UDP_PORT = 23370;
 const int CE_SERVER_UDP_PORT = 21370; 
+const int BUFFER_SIZE = 1024;
 
 using namespace std;
 
@@ -76,6 +77,22 @@ int main() {
 
     std::cout << "ServerCE  finished  sending  a  list  of "
                  "usernames  to  Main  Server. " << std::endl;  
+
+
+    while(1){
+        char CEnames[BUFFER_SIZE]; 
+        memset(CEnames, 0, sizeof(CEnames));
+        sockaddr_in senderAddress{}; 
+        socklen_t senderAddressLength = sizeof(senderAddress);
+        ssize_t udpBytesReceived = recvfrom(udpSocket, CEnames, sizeof(CEnames), 0, 
+                                (struct sockaddr *)&senderAddress, &senderAddressLength);
+
+        if (udpBytesReceived == -1){
+            std::cerr << "Failed to receive UDP data from client 2." << std::endl;
+            return 1; 
+        }
+        cout << "Names receieved from main server: " << CEnames << endl;
+    }
 
     // Close the UDP Socket
     close(udpSocket); 

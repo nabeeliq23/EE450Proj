@@ -12,7 +12,9 @@
 #include  <sys/wait.h>
 #include  <signal.h>
 #include  <vector>
+#include <algorithm>
 #include "helperFuncs.h"
+
 
 const int MAIN_SERVER_UDP_PORT = 23370;
 const int MAIN_SERVER_TCP_PORT = 24370;
@@ -62,7 +64,7 @@ int main() {
         return 1; 
     }
 
-    //Recieve and print UDP data from client 1
+    //Recieve and print UDP data from CEserver
     char CEnames[BUFFER_SIZE]; 
     memset(CEnames, 0, sizeof(CEnames));
     sockaddr_in senderAddress1{}; 
@@ -81,7 +83,7 @@ int main() {
     std::string CEnames1 = CEnames; 
     std::vector<std::string> CEserverNames = splitString(CEnames1, " ");   
 
-    //Receive and print UDP data from client 2
+    //Receive and print UDP data from EEserver 
     char EEnames[BUFFER_SIZE]; 
     memset(EEnames, 0, sizeof(EEnames));
     sockaddr_in senderAddress2{}; 
@@ -145,18 +147,65 @@ int main() {
         for(int i = 0; i < studNames.size(); i++){
             std::string currName = studNames[i]; 
 
-            if(std::find(CEserverNames.begin, CEServerNames.end(), currName)!= CEserverNames.end()){
+            if(std::find(CEserverNames.begin(), CEserverNames.end(), currName)!= CEserverNames.end()){
                 CEsend += currName + " "; 
             }
 
-            if(std::find(EEserverNames.begin, EEserverNames.end(), currName)!= EEserverNames.end()){
+            if(std::find(EEserverNames.begin(), EEserverNames.end(), currName)!= EEserverNames.end()){
                 EEsend += currName + " "; 
             }
 
         }
+        // Names does not exist in either Server
+        if(CEsend == "" && EEsend == ""){
+            std::string response = "does not exist";
+            if(send(clientSocket, response.c_str(),response.size(), 0) == -1){
+                std::cerr << "Failed to send UDP response." << std::endl;
+                return 1;
+            }
+        } 
+        //std::cout << "after empty list" << std::endl;
+        if(sendto(udpSocket, CEsend.c_str(), CEsend.size(), 0,
+                (struct sockaddr *)&senderAddress1, senderAddressLength1) < 0){
+                std::cerr << "Failed to send UDP data. [CEserver]" << std::endl; 
+                close(udpSocket); 
+                return 1; 
+        }
+        /*
+        //Names getting sent to serverCE
+        else if(CEsend != ""){
+            std::string response1 = "Found ... located at ServerCE. Send to ServerCE";
+            if(send(clientSocket, response1.c_str(),response1.size(), 0) == -1){
+                std::cerr << "Failed to send UDP response." << std::endl;
+                return 1;
+            }
+            //int num = sendto(udpSocket, CEsend.c_str(), CEsend.size(), 0,
+                //(struct sockaddr *)&senderAddress1, sizeof(senderAddressLength1));
+            if(sendto(udpSocket, CEsend.c_str(), CEsend.size(), 0,
+                (struct sockaddr *)&senderAddress1, senderAddressLength1) < 0){
+                std::cerr << "Failed to send UDP data. [CEserver]" << std::endl; 
+                //std::cerr << "Error message: " << gai_strerror(num) << std::endl;
+                close(udpSocket); 
+                return 1; 
+            }
+        } 
+        /*
+        //Names getting sent to serverEE
+        else if (EEsend != "") {
+            std::string response2 = "Found ... located at ServerEE. Send to ServerEE";
+            if(send(clientSocket, response2.c_str(),response2.size(), 0) == -1){
+                std::cerr << "Failed to send UDP response." << std::endl;
+                return 1;
+            }
+            if(sendto(udpSocket, EEsend.c_str(), EEsend.size(), 0,
+                (struct sockaddr *)&senderAddress2, sizeof(senderAddressLength2)) < 0){
+                std::cerr << "Failed to send UDP data. [EEserver]" << std::endl; 
+                close(udpSocket); 
+                return 1; 
+            }
+        }
         
-        
-
+        */
         std::cout << "TCP Data: " << tcpBuffer << std::endl; 
         
    } 
