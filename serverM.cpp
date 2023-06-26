@@ -130,6 +130,10 @@ int main() {
     std::vector<std::string> studNames;
     std::string CEsend = ""; 
     std:: string EEsend = "";
+    char CEresponse[BUFFER_SIZE]; 
+    memset(CEresponse, 0, sizeof(CEresponse));
+    char EEresponse[BUFFER_SIZE]; 
+    memset(EEresponse, 0, sizeof(EEresponse));
 
    while(1){
         
@@ -193,6 +197,19 @@ int main() {
                 std::cerr << "Failed to send UDP data. [CEserver]" << std::endl; 
                 close(udpSocket); 
                 return 1; 
+            }
+
+            udpBytesReceived1 = recvfrom(udpSocket, CEresponse, sizeof(CEresponse), 0, 
+                                (struct sockaddr *)&senderAddress1, &senderAddressLength1);
+            if (udpBytesReceived1 == -1){
+                std::cerr << "Failed to receive UDP data from client 1." << std::endl;
+                return 1; 
+            }
+            std::string CEresponse1 = CEresponse;
+            std::cout << "CEresponse1: "<< CEresponse1 << std::endl;
+            if(send(clientSocket, CEresponse1.c_str(),CEresponse1.size(), 0) == -1){
+                std::cerr << "Failed to send UDP response." << std::endl;
+                return 1;
             }
          
         } else if (EEsend != "") {
