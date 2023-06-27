@@ -23,7 +23,7 @@ const int BUFFER_SIZE = 1024;
 
 int main() {
      
-     std::cout << "Main server is up and running." << std::endl; 
+    std::cout << "Main server is up and running." << std::endl; 
 
     //Create TCP socket
     int tcpSocket = socket(AF_INET, SOCK_STREAM, 0); 
@@ -122,24 +122,11 @@ int main() {
     }
 
     std::cout << "Client connected." << std::endl; 
-/*
-    //Init Variables
-    char tcpBuffer[BUFFER_SIZE];
-    ssize_t tcpBytesReceived; 
-    std::string clientNames;
-    std::vector<std::string> studNames;
-    std::string CEsend = ""; 
-    std:: string EEsend = "";
-    char CEresponse[BUFFER_SIZE]; 
-    memset(CEresponse, 0, sizeof(CEresponse));
-    char EEresponse[BUFFER_SIZE]; 
-    memset(EEresponse, 0, sizeof(EEresponse));
-    */
+
 
    while(1){
         char tcpBuffer[BUFFER_SIZE];
         ssize_t tcpBytesReceived; 
-         
         
         char CEresponse[BUFFER_SIZE]; 
         memset(CEresponse, 0, sizeof(CEresponse));
@@ -202,17 +189,40 @@ int main() {
 
             udpBytesReceived1 = recvfrom(udpSocket, CEresponse, sizeof(CEresponse), 0, 
                                 (struct sockaddr *)&senderAddress1, &senderAddressLength1);
+
             udpBytesReceived2 = recvfrom(udpSocket, EEresponse, sizeof(EEresponse), 0, 
                                 (struct sockaddr *)&senderAddress2, &senderAddressLength2);
+
             if (udpBytesReceived1 == -1 || udpBytesReceived2 == -1){
                 std::cerr << "Failed to receive UDP data from client 1." << std::endl;
                 return 1; 
             }
-            std::string bothResponse = CEresponse;
-            //bothResponse+= "\n";
-            //bothResponse+= EEresponse;
-            std::cout << "bothResponse: "<< bothResponse << std::endl;
-            if(send(clientSocket, bothResponse.c_str(),bothResponse.size(), 0) == -1){
+
+            
+            std::vector<std::string> totalResponseCE = splitString(CEresponse, "::"); 
+            std::string firstResponseCE = totalResponseCE[0];  
+            std::string intervalsResponseCE = totalResponseCE[1];    
+            std::vector<std::vector<int>> ceIntervals = readInterval(intervalsResponseCE);
+            
+
+            std::cout << "EEresponse: " << EEresponse << std::endl; 
+            std::vector<std::string> totalResponseEE = splitString(EEresponse, "::");  
+            std::string firstResponseEE = totalResponseEE[0];
+            std::cout << "First Response: " << firstResponseEE << std::endl;
+            std::string intervalsResponseEE = "[[5,6]]"; 
+            std::cout << "Interval EE: " << intervalsResponseEE << std::endl;
+            std::vector<std::vector<int>> eeIntervals = readInterval(intervalsResponseEE);
+
+            bool isOverlap = classOverlap(ceIntervals, eeIntervals);
+            
+            std::string response = ""; 
+            if(isOverlap){
+                response += "Intersection exist between " + CEsend + " and " + EEsend;  
+            } else {
+                response += "No intersection exist between " + CEsend + " and " + EEsend; 
+            }
+            
+            if(send(clientSocket, response.c_str(), response.size(), 0) == -1){
                 std::cerr << "Failed to send UDP response." << std::endl;
                 return 1;
             }
@@ -234,11 +244,8 @@ int main() {
                 std::cerr << "Failed to receive UDP data from client 1." << std::endl;
                 return 1; 
             }
-            //for(int i = 0; i<CEresponse.size(); i++){
-                //std::cout << "CEresponse size " << sizeof(CEresponse)<< std::endl;
-            //}
+            
             std::string CEresponse1 = CEresponse;
-            std::cout << "CEresponse1: "<< CEresponse1 << std::endl;
             if(send(clientSocket, CEresponse1.c_str(),CEresponse1.size(), 0) == -1){
                 std::cerr << "Failed to send UDP response." << std::endl;
                 return 1;
@@ -257,10 +264,12 @@ int main() {
 
             udpBytesReceived2 = recvfrom(udpSocket, EEresponse, sizeof(EEresponse), 0, 
                                 (struct sockaddr *)&senderAddress2, &senderAddressLength2);
+            
             if (udpBytesReceived2 == -1){
                 std::cerr << "Failed to receive UDP data from client 1." << std::endl;
                 return 1; 
             }
+            
             std::string EEresponse1 = EEresponse;
             std::cout << "EEresponse1: " << EEresponse1 << std::endl;
             if(send(clientSocket, EEresponse1.c_str(),EEresponse1.size(), 0) == -1){

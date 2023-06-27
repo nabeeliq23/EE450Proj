@@ -99,15 +99,18 @@ int main() {
         std::vector<string> CEvector   = splitString(name, " "); 
 
         std::string response = " do not exist.";
+
         if(CEvector.size() == 2){
             std::vector<std::vector<int>> stud1 = data[CEvector[0]];
             std::vector<std::vector<int>> stud2 = data[CEvector[1]];   
             bool isOverlap = classOverlap(stud1, stud2);
-            response = "Found " + CEvector[0] + " located at CE.";
-            
-            //std::vector<int> list = courseList[0];
-            //std::cout << "list to string: "<< std::to_string(list[0]) << "---" << std::to_string(list[1]) << endl;
-            response = "Main Server received from server CE the intersection result using UDP over port (CEPort)";
+            response = "Found " + CEvector[0] + "," + CEvector[1] + " located at CE.\n";
+
+            if(isOverlap){
+                response += "Main Server received from server CE the intersection result using UDP over port (CEPort)";
+            } else {
+                response += "No overlap found between these names.";
+            }
             
             if(sendto(udpSocket, response.c_str(), response.size(), 0,
                 (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
@@ -116,38 +119,45 @@ int main() {
                 return 1; 
             }
         } else {
-            response = "Found " + CEvector[0] + " located at CE.";
-            //cout << "Response: "<< response << endl;
-            //std::vector<std::vector<int>> courseList = data[CEvector[0]];
-            //std::vector<int> list = courseList[0];
-            //std::cout << "list to string: "<< std::to_string(list[0]) << "---" << std::to_string(list[1]) << endl;
+            response = "Found " + CEvector[0] + " located at CE.::";
             
+            std::string intervals = "["; 
+            std::string key = CEvector[0];
+            std::vector<std::vector<int>> stud = data[key];
 
-            std::vector<int> courseList;
-            for(const auto& names: data){
-                // std::cout << "names: " << names.first << endl;
-                if(names.first == CEvector[0]){
-                    for(const auto& courses: names.second){
-                        courseList.insert(courseList.end(), courses.begin(),courses.end());
-                    }
+            size_t totalElements = stud.size(); 
+            size_t currentIteration = 0; 
+            
+            for(const auto& range: stud){
+                ++currentIteration; 
+
+                intervals += "["; 
+                intervals += std::to_string(range[0]); 
+                intervals += ",";
+                intervals += std::to_string(range[1]); 
+                intervals += "]";
+
+                if(currentIteration != totalElements){
+                    intervals += ",";
+                } else {
+                    intervals += "]"; 
                 }
             }
-          
-            if(sendto(udpSocket, courseList.data(), courseList.size(), 0,
+
+            response += intervals; 
+            std::cout << "Response split case: " << response << std::endl; 
+
+            if(sendto(udpSocket, response.c_str(), response.size(), 0,
                 (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
                 std::cerr << "Failed to send UDP data." << std::endl; 
                 close(udpSocket); 
                 return 1; 
             }
+          
         }
-        /*
-        if(sendto(udpSocket, response.c_str(), response.size(), 0,
-            (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
-            std::cerr << "Failed to send UDP data." << std::endl; 
-            close(udpSocket); 
-            return 1; 
-        }
-        */
+        
+       
+        
     }
 
     // Close the UDP Socket

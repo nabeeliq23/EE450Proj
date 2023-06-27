@@ -42,6 +42,29 @@ std::vector<int> parseIntervals(std::string input){
 }
 
 
+ std::vector<std::vector<int>> readInterval(std::string line){
+     
+    std::vector<std::vector<int>> intervals; 
+
+    //Remove the outermost opening and closing brackets
+    line = line.substr(1, line.size()-3); 
+
+    //Split the intervals
+    std::string intervalSplit = "],";
+    std::vector<std::string> intervalTokens = splitString(line, intervalSplit);
+    
+    for(const auto& intervalToken : intervalTokens){
+        if(!intervalToken.empty()){
+            std::vector<int> intervalNumbers = parseIntervals(intervalToken);
+            intervals.push_back(intervalNumbers);
+        }
+    }
+
+
+    return intervals; 
+}
+
+
 std::map<std::string, std::vector<std::vector<int>>> readInput(std::string fileName){
     std::map<std::string, std::vector<std::vector<int>>> dataMap; //Output data structure
     std::ifstream inputFile(fileName); 

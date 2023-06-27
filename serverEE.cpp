@@ -99,16 +99,38 @@ int main() {
             std::vector<std::vector<int>> stud1 = data[EEvector[0]];
             std::vector<std::vector<int>> stud2 = data[EEvector[1]];   
             bool isOverlap = classOverlap(stud1, stud2);
-            response = "Main Server received from server EE the intersection result using UDP over port (EEPort)";
+            response = "Found " + EEvector[0] + "," + EEvector[1] + " located at EE.\n";
+
+            if(isOverlap){
+                response += "Main Server received from server EE the intersection result using UDP over port (EEPort)";
+            } else {
+                response += "No overlap found between these names.";
+            }
+            
+            if(sendto(udpSocket, response.c_str(), response.size(), 0,
+                (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
+                std::cerr << "Failed to send UDP data." << std::endl; 
+                close(udpSocket); 
+                return 1; 
+            }
+        
+        
         } else {
             response = "Found " + EEvector[0] + " located at EE.";
+
+
+
+            if(sendto(udpSocket, response.c_str(), response.size(), 0,
+                (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
+                std::cerr << "Failed to send UDP data." << std::endl; 
+                close(udpSocket); 
+                return 1; 
+            }
+
+
+
         }
-        if(sendto(udpSocket, response.c_str(), response.size(), 0,
-            (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
-            std::cerr << "Failed to send UDP data." << std::endl; 
-            close(udpSocket); 
-            return 1; 
-        }
+       
     }
 
     // Close the UDP Socket
