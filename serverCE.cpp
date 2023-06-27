@@ -11,6 +11,8 @@
 #include  <arpa/inet.h>
 #include  <sys/wait.h>
 #include  <signal.h>
+#include <vector>
+//#include <cstring>
 #include "helperFuncs.h"
 
 
@@ -29,6 +31,7 @@ int main() {
     // Read in Data
     std::string filename = "CE.txt";
     std::map<std::string, std::vector<std::vector<int>>> data = readInput("CE.txt"); 
+    
     
     // Create UDP socket
     int udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -100,16 +103,57 @@ int main() {
             std::vector<std::vector<int>> stud1 = data[CEvector[0]];
             std::vector<std::vector<int>> stud2 = data[CEvector[1]];   
             bool isOverlap = classOverlap(stud1, stud2);
+            response = "Found " + CEvector[0] + " located at CE.";
+            
+            //std::vector<int> list = courseList[0];
+            //std::cout << "list to string: "<< std::to_string(list[0]) << "---" << std::to_string(list[1]) << endl;
             response = "Main Server received from server CE the intersection result using UDP over port (CEPort)";
+            
+            if(sendto(udpSocket, response.c_str(), response.size(), 0,
+                (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
+                std::cerr << "Failed to send UDP data." << std::endl; 
+                close(udpSocket); 
+                return 1; 
+            }
         } else {
             response = "Found " + CEvector[0] + " located at CE.";
+            //cout << "Response: "<< response << endl;
+            //std::vector<std::vector<int>> courseList = data[CEvector[0]];
+            //std::vector<int> list = courseList[0];
+            //std::cout << "list to string: "<< std::to_string(list[0]) << "---" << std::to_string(list[1]) << endl;
+            
+
+            std::vector<int> courseList;
+            for(const auto& names: data){
+                std::cout << "names: " << names.first << endl;
+                if(names.first == CEvector[0]){
+                    for(const auto& courses: names.second){
+                        courseList.insert(courseList.end(), courses.begin(),courses.end());
+                    }
+                }
+            }
+            /*
+            std::string courseNumbers;
+            for(int i = 0; i<courseList.size(); i++){
+                std::cout << "courseList " << i << ": " << courseList[i]<< std::endl;
+            }
+            */
+            std::cout << "courseList: " << courseList.data() << endl;
+            if(sendto(udpSocket, courseList.data(), courseList.size(), 0,
+                (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
+                std::cerr << "Failed to send UDP data." << std::endl; 
+                close(udpSocket); 
+                return 1; 
+            }
         }
+        /*
         if(sendto(udpSocket, response.c_str(), response.size(), 0,
             (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
             std::cerr << "Failed to send UDP data." << std::endl; 
             close(udpSocket); 
             return 1; 
         }
+        */
     }
 
     // Close the UDP Socket

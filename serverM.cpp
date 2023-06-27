@@ -122,7 +122,7 @@ int main() {
     }
 
     std::cout << "Client connected." << std::endl; 
-
+/*
     //Init Variables
     char tcpBuffer[BUFFER_SIZE];
     ssize_t tcpBytesReceived; 
@@ -134,9 +134,20 @@ int main() {
     memset(CEresponse, 0, sizeof(CEresponse));
     char EEresponse[BUFFER_SIZE]; 
     memset(EEresponse, 0, sizeof(EEresponse));
+    */
 
    while(1){
-        
+        char tcpBuffer[BUFFER_SIZE];
+        ssize_t tcpBytesReceived; 
+        std::string clientNames;
+        std::vector<std::string> studNames;
+        std::string CEsend = ""; 
+        std:: string EEsend = "";
+        char CEresponse[BUFFER_SIZE]; 
+        memset(CEresponse, 0, sizeof(CEresponse));
+        char EEresponse[BUFFER_SIZE]; 
+        memset(EEresponse, 0, sizeof(EEresponse));
+
         memset(tcpBuffer, 0, sizeof(tcpBuffer)); 
         tcpBytesReceived = recv(clientSocket, tcpBuffer, sizeof(tcpBuffer), 0); 
         if(tcpBytesReceived == -1){
@@ -169,10 +180,8 @@ int main() {
                 return 1;
             }
         } else if(CEsend != "" && EEsend != ""){
-            std::cout << "Found " << CEsend << "located at server CE." << 
-            std::endl << "Send to Server CE.";
-            std::cout << "Found " << EEsend << "located at server EE." << 
-            std::endl << "Send to Server EE.";  
+            std::cout << "Found " << CEsend << "located at server CE." << std::endl;
+            std::cout << "Found " << EEsend << "located at server EE." << std::endl;  
 
             if(sendto(udpSocket, CEsend.c_str(), CEsend.size(), 0,
                 (struct sockaddr *)&senderAddress1, senderAddressLength1) < 0){
@@ -188,7 +197,24 @@ int main() {
                 return 1; 
             }
 
-        } else if(CEsend != ""){
+            udpBytesReceived1 = recvfrom(udpSocket, CEresponse, sizeof(CEresponse), 0, 
+                                (struct sockaddr *)&senderAddress1, &senderAddressLength1);
+            udpBytesReceived2 = recvfrom(udpSocket, EEresponse, sizeof(EEresponse), 0, 
+                                (struct sockaddr *)&senderAddress2, &senderAddressLength2);
+            if (udpBytesReceived1 == -1 || udpBytesReceived2 == -1){
+                std::cerr << "Failed to receive UDP data from client 1." << std::endl;
+                return 1; 
+            }
+            std::string bothResponse = CEresponse;
+            //bothResponse+= "\n";
+            //bothResponse+= EEresponse;
+            std::cout << "bothResponse: "<< bothResponse << std::endl;
+            if(send(clientSocket, bothResponse.c_str(),bothResponse.size(), 0) == -1){
+                std::cerr << "Failed to send UDP response." << std::endl;
+                return 1;
+            }
+
+        } else if(CEsend != "" && EEsend == ""){
             std::cout << "Found " <<  CEsend << 
             " located at server CE. Send to Server CE" << std::endl;
             
@@ -205,6 +231,9 @@ int main() {
                 std::cerr << "Failed to receive UDP data from client 1." << std::endl;
                 return 1; 
             }
+            //for(int i = 0; i<CEresponse.size(); i++){
+                //std::cout << "CEresponse size " << sizeof(CEresponse)<< std::endl;
+            //}
             std::string CEresponse1 = CEresponse;
             std::cout << "CEresponse1: "<< CEresponse1 << std::endl;
             if(send(clientSocket, CEresponse1.c_str(),CEresponse1.size(), 0) == -1){
@@ -212,7 +241,7 @@ int main() {
                 return 1;
             }
          
-        } else if (EEsend != "") {
+        } else if (EEsend != "" && CEsend == "") {
             std::cout << "Found " <<  EEsend << 
             " located at server EE. Send to Server EE" << std::endl;
 
@@ -222,10 +251,37 @@ int main() {
                 close(udpSocket); 
                 return 1; 
             }
+
+            udpBytesReceived2 = recvfrom(udpSocket, EEresponse, sizeof(EEresponse), 0, 
+                                (struct sockaddr *)&senderAddress1, &senderAddressLength1);
+            if (udpBytesReceived2 == -1){
+                std::cerr << "Failed to receive UDP data from client 1." << std::endl;
+                return 1; 
+            }
+            std::string EEresponse1 = EEresponse;
+            std::cout << "EEresponse1: " << EEresponse1 << std::endl;
+            if(send(clientSocket, EEresponse1.c_str(),EEresponse1.size(), 0) == -1){
+                std::cerr << "Failed to send UDP response." << std::endl;
+                return 1;
+            }
         }
         
         
         std::cout << "TCP Data: " << tcpBuffer << std::endl; 
+
+        /*
+        //resetting variables
+        tcpBuffer[BUFFER_SIZE] = NULL;
+        tcpBytesReceived  = NULL; 
+        clientNames = "";
+        studNames.empty();
+        CEsend = ""; 
+        EEsend = "";
+        CEresponse[BUFFER_SIZE] = NULL; 
+        memset(CEresponse, 0, sizeof(CEresponse));
+        EEresponse[BUFFER_SIZE] = NULL; 
+        memset(EEresponse, 0, sizeof(EEresponse));
+        */
         
    } 
 

@@ -91,7 +91,24 @@ int main() {
             return 1; 
         }
         cout << "Names receieved from main server: " << EEnames << endl;
-        return 1; 
+        std::string names = EEnames;
+        std::vector<string> EEvector   = splitString(names, " "); 
+
+        std::string response = " do not exist.";
+        if(EEvector.size() == 2){
+            std::vector<std::vector<int>> stud1 = data[EEvector[0]];
+            std::vector<std::vector<int>> stud2 = data[EEvector[1]];   
+            bool isOverlap = classOverlap(stud1, stud2);
+            response = "Main Server received from server EE the intersection result using UDP over port (EEPort)";
+        } else {
+            response = "Found " + EEvector[0] + " located at EE.";
+        }
+        if(sendto(udpSocket, response.c_str(), response.size(), 0,
+            (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
+            std::cerr << "Failed to send UDP data." << std::endl; 
+            close(udpSocket); 
+            return 1; 
+        }
     }
 
     // Close the UDP Socket
