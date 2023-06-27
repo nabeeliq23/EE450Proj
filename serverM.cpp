@@ -147,7 +147,7 @@ int main() {
 
         
         std::string CEsend = ""; 
-        std:: string EEsend = "";
+        std::string EEsend = "";
 
         for(int i = 0; i < studNames.size(); i++){
             std::string currName = studNames[i]; 
@@ -199,17 +199,18 @@ int main() {
             }
 
             
-            std::vector<std::string> totalResponseCE = splitString(CEresponse, "::"); 
-            std::string firstResponseCE = totalResponseCE[0];  
-            std::string intervalsResponseCE = totalResponseCE[1];    
+            std::vector<std::string> totalResponseCE = splitString(CEresponse, "::");
+            std::string firstResponseCE = totalResponseCE[0]; 
+            std::cout << "First Response CE: " << firstResponseCE << std::endl; 
+            std::string intervalsResponseCE = totalResponseCE[1];  
+            std::cout << "Interval CE: " << intervalsResponseCE << std::endl;  
             std::vector<std::vector<int>> ceIntervals = readInterval(intervalsResponseCE);
             
 
-            std::cout << "EEresponse: " << EEresponse << std::endl; 
             std::vector<std::string> totalResponseEE = splitString(EEresponse, "::");  
             std::string firstResponseEE = totalResponseEE[0];
             std::cout << "First Response: " << firstResponseEE << std::endl;
-            std::string intervalsResponseEE = "[[5,6]]"; 
+            std::string intervalsResponseEE = totalResponseEE[1]; 
             std::cout << "Interval EE: " << intervalsResponseEE << std::endl;
             std::vector<std::vector<int>> eeIntervals = readInterval(intervalsResponseEE);
 
@@ -217,9 +218,9 @@ int main() {
             
             std::string response = ""; 
             if(isOverlap){
-                response += "Intersection exist between " + CEsend + " and " + EEsend;  
+                response += "Intersection exist between " + CEsend + "and " + EEsend;  
             } else {
-                response += "No intersection exist between " + CEsend + " and " + EEsend; 
+                response += "No intersection exist between " + CEsend + "and " + EEsend; 
             }
             
             if(send(clientSocket, response.c_str(), response.size(), 0) == -1){
@@ -280,20 +281,6 @@ int main() {
         
         
         std::cout << "TCP Data: " << tcpBuffer << std::endl; 
-
-        /*
-        //resetting variables
-        tcpBuffer[BUFFER_SIZE] = NULL;
-        tcpBytesReceived  = NULL; 
-        clientNames = "";
-        studNames.empty();
-        CEsend = ""; 
-        EEsend = "";
-        CEresponse[BUFFER_SIZE] = NULL; 
-        memset(CEresponse, 0, sizeof(CEresponse));
-        EEresponse[BUFFER_SIZE] = NULL; 
-        memset(EEresponse, 0, sizeof(EEresponse));
-        */
         
    } 
 

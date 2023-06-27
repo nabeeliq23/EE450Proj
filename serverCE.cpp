@@ -140,7 +140,7 @@ int main() {
                 if(currentIteration != totalElements){
                     intervals += ",";
                 } else {
-                    intervals += "]"; 
+                    intervals += "]::"; 
                 }
             }
 

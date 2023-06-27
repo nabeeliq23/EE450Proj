@@ -116,8 +116,33 @@ int main() {
         
         
         } else {
-            response = "Found " + EEvector[0] + " located at EE.";
+            response = "Found " + EEvector[0] + " located at EE.::";
+            
+            std::string intervals = "["; 
+            std::string key = EEvector[0];
+            std::vector<std::vector<int>> stud = data[key];
 
+            size_t totalElements = stud.size(); 
+            size_t currentIteration = 0; 
+            
+            for(const auto& range: stud){
+                ++currentIteration; 
+
+                intervals += "["; 
+                intervals += std::to_string(range[0]); 
+                intervals += ",";
+                intervals += std::to_string(range[1]); 
+                intervals += "]";
+
+                if(currentIteration != totalElements){
+                    intervals += ",";
+                } else {
+                    intervals += "]::"; 
+                }
+            }
+
+            response += intervals; 
+            std::cout << "Response split case: " << response << std::endl; 
 
 
             if(sendto(udpSocket, response.c_str(), response.size(), 0,
@@ -126,8 +151,6 @@ int main() {
                 close(udpSocket); 
                 return 1; 
             }
-
-
 
         }
        
