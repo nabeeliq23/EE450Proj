@@ -70,7 +70,7 @@ int main() {
         send(clientSocket, request.c_str(), request.size(), 0);
 
         // Receive response from main server
-        char buffer[1024];
+        char buffer[1024] = "";
         int bytesRead = read(clientSocket, buffer, 1024);
         std::cout << "Response from main server: " << buffer << std::endl;
 

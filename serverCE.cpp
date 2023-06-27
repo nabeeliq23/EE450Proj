@@ -145,7 +145,6 @@ int main() {
             }
 
             response += intervals; 
-            std::cout << "Response split case: " << response << std::endl; 
 
             if(sendto(udpSocket, response.c_str(), response.size(), 0,
                 (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){

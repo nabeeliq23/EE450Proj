@@ -125,6 +125,11 @@ int main() {
 
 
    while(1){
+
+        std::string CEsend = ""; 
+        std::string EEsend = "";
+        std::string response = "";
+
         char tcpBuffer[BUFFER_SIZE];
         ssize_t tcpBytesReceived; 
         
@@ -145,19 +150,23 @@ int main() {
         std::string clientNames = tcpBuffer; 
         std::vector<std::string> studNames   = splitString(clientNames, " ");
 
-        
-        std::string CEsend = ""; 
-        std::string EEsend = "";
-
         for(int i = 0; i < studNames.size(); i++){
             std::string currName = studNames[i]; 
 
             if(std::find(CEserverNames.begin(), CEserverNames.end(), currName)!= CEserverNames.end()){
-                CEsend += currName + " "; 
+                if(CEsend == ""){
+                    CEsend += currName; 
+                } else {
+                  CEsend += " " + currName;  
+                }
             }
 
             if(std::find(EEserverNames.begin(), EEserverNames.end(), currName)!= EEserverNames.end()){
-                EEsend += currName + " "; 
+                if(EEsend  == ""){   
+                    EEsend += currName; 
+                } else {
+                  EEsend += " " + currName;  
+                }           
             }
 
         }
@@ -170,8 +179,8 @@ int main() {
                 return 1;
             }
         } else if(CEsend != "" && EEsend != ""){
-            std::cout << "Found " << CEsend << "located at server CE." << std::endl;
-            std::cout << "Found " << EEsend << "located at server EE." << std::endl;  
+            std::cout << "Found " << CEsend << " located at server CE." << std::endl;
+            std::cout << "Found " << EEsend << " located at server EE." << std::endl;  
 
             if(sendto(udpSocket, CEsend.c_str(), CEsend.size(), 0,
                 (struct sockaddr *)&senderAddress1, senderAddressLength1) < 0){
@@ -200,27 +209,24 @@ int main() {
 
             
             std::vector<std::string> totalResponseCE = splitString(CEresponse, "::");
-            std::string firstResponseCE = totalResponseCE[0]; 
-            std::cout << "First Response CE: " << firstResponseCE << std::endl; 
+            std::string firstResponseCE = totalResponseCE[0];  
             std::string intervalsResponseCE = totalResponseCE[1];  
-            std::cout << "Interval CE: " << intervalsResponseCE << std::endl;  
             std::vector<std::vector<int>> ceIntervals = readInterval(intervalsResponseCE);
             
 
             std::vector<std::string> totalResponseEE = splitString(EEresponse, "::");  
             std::string firstResponseEE = totalResponseEE[0];
-            std::cout << "First Response: " << firstResponseEE << std::endl;
             std::string intervalsResponseEE = totalResponseEE[1]; 
-            std::cout << "Interval EE: " << intervalsResponseEE << std::endl;
             std::vector<std::vector<int>> eeIntervals = readInterval(intervalsResponseEE);
 
             bool isOverlap = classOverlap(ceIntervals, eeIntervals);
             
-            std::string response = ""; 
+            response = ""; 
+
             if(isOverlap){
-                response += "Intersection exist between " + CEsend + "and " + EEsend;  
+                response += "Intersection exist between " + CEsend + " and " + EEsend;  
             } else {
-                response += "No intersection exist between " + CEsend + "and " + EEsend; 
+                response += "No intersection exist between " + CEsend + " and " + EEsend; 
             }
             
             if(send(clientSocket, response.c_str(), response.size(), 0) == -1){
@@ -272,15 +278,11 @@ int main() {
             }
             
             std::string EEresponse1 = EEresponse;
-            std::cout << "EEresponse1: " << EEresponse1 << std::endl;
             if(send(clientSocket, EEresponse1.c_str(),EEresponse1.size(), 0) == -1){
                 std::cerr << "Failed to send UDP response." << std::endl;
                 return 1;
             }
-        }
-        
-        
-        std::cout << "TCP Data: " << tcpBuffer << std::endl; 
+        } 
         
    } 
 
