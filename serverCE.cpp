@@ -125,20 +125,14 @@ int main() {
 
             std::vector<int> courseList;
             for(const auto& names: data){
-                std::cout << "names: " << names.first << endl;
+                // std::cout << "names: " << names.first << endl;
                 if(names.first == CEvector[0]){
                     for(const auto& courses: names.second){
                         courseList.insert(courseList.end(), courses.begin(),courses.end());
                     }
                 }
             }
-            /*
-            std::string courseNumbers;
-            for(int i = 0; i<courseList.size(); i++){
-                std::cout << "courseList " << i << ": " << courseList[i]<< std::endl;
-            }
-            */
-            std::cout << "courseList: " << courseList.data() << endl;
+          
             if(sendto(udpSocket, courseList.data(), courseList.size(), 0,
                 (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
                 std::cerr << "Failed to send UDP data." << std::endl; 

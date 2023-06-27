@@ -139,12 +139,11 @@ int main() {
    while(1){
         char tcpBuffer[BUFFER_SIZE];
         ssize_t tcpBytesReceived; 
-        std::string clientNames;
-        std::vector<std::string> studNames;
-        std::string CEsend = ""; 
-        std:: string EEsend = "";
+         
+        
         char CEresponse[BUFFER_SIZE]; 
         memset(CEresponse, 0, sizeof(CEresponse));
+        
         char EEresponse[BUFFER_SIZE]; 
         memset(EEresponse, 0, sizeof(EEresponse));
 
@@ -156,8 +155,12 @@ int main() {
         }
         
         //Take client name and seperate into two
-        clientNames = tcpBuffer; 
-        studNames   = splitString(clientNames, " ");
+        std::string clientNames = tcpBuffer; 
+        std::vector<std::string> studNames   = splitString(clientNames, " ");
+
+        
+        std::string CEsend = ""; 
+        std:: string EEsend = "";
 
         for(int i = 0; i < studNames.size(); i++){
             std::string currName = studNames[i]; 
@@ -253,7 +256,7 @@ int main() {
             }
 
             udpBytesReceived2 = recvfrom(udpSocket, EEresponse, sizeof(EEresponse), 0, 
-                                (struct sockaddr *)&senderAddress1, &senderAddressLength1);
+                                (struct sockaddr *)&senderAddress2, &senderAddressLength2);
             if (udpBytesReceived2 == -1){
                 std::cerr << "Failed to receive UDP data from client 1." << std::endl;
                 return 1; 
