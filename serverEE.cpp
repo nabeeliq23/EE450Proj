@@ -92,22 +92,21 @@ int main() {
         }
         cout << "ServerEE received the usernames from Main Server using UDP over port "
                             << to_string(EE_SERVER_UDP_PORT) << "." << endl;
-        //cout << "Names receieved from main server: " << EEnames << endl;
         std::string names = EEnames;
         std::vector<string> EEvector   = splitString(names, " "); 
 
-        std::string response = " do not exist.";
+        std::string response = "";
         if(EEvector.size() == 2){
             std::vector<std::vector<int>> stud1 = data[EEvector[0]];
             std::vector<std::vector<int>> stud2 = data[EEvector[1]];   
             bool isOverlap = classOverlap(stud1, stud2);
-            //response = "Found " + EEvector[0] + "," + EEvector[1] + " located at EE.\n";
 
             if(isOverlap){
                 cout << "Found the intersection result for " << EEvector[0] <<  ", " << EEvector[1] << "." << endl;
-                response = "Main Server received from server EE the intersection result using UDP over port " + to_string(EE_SERVER_UDP_PORT) + ".";
+                response = "Course intervals were found for " + EEvector[0] + ", " + EEvector[1] + ".";
             } else {
-                response = "No overlap found between " + EEvector[0] +  ", " + EEvector[1] + ".";
+                cout << "No Course intervals were found for " << EEvector[0] +  ", " << EEvector[1] << "." << endl;
+                response = "No Course intervals were found for " + EEvector[0] +  ", " + EEvector[1] + ".";
             }
             
             if(sendto(udpSocket, response.c_str(), response.size(), 0,
@@ -120,6 +119,7 @@ int main() {
         
         } else {
             response = "Found " + EEvector[0] + " located at EE.::";
+            cout << "No Course intervals were found for " << EEvector[0] << "." << endl;
             
             std::string intervals = "["; 
             std::string key = EEvector[0];

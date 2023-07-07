@@ -121,10 +121,10 @@ int main() {
         return 1; 
     }
     
-    cout << "Main Server received the request from the client using TCP over port " << to_string(MAIN_SERVER_TCP_PORT) << "." << endl;
+    
 
    while(1){
-
+        
         std::string CEsend = ""; 
         std::string EEsend = "";
         std::string response = "";
@@ -144,7 +144,7 @@ int main() {
             std::cerr << "Failed to receive TCP data." << std::endl; 
             return 1; 
         }
-        
+        cout << "Main Server received the request from the client using TCP over port " << to_string(MAIN_SERVER_TCP_PORT) << "." << endl;
         //Take client name and seperate into two
         std::string clientNames = tcpBuffer; 
         std::vector<std::string> studNames   = splitString(clientNames, " ");
@@ -185,7 +185,7 @@ int main() {
                     cout << notFoundNames[i] << " do not exist. Send a reply to the client." << endl;
                 }
             }
-            std::string response =  "does not exist";
+            std::string response = studNames[0] + ", " + studNames[1] + " does not exist";
             if(send(clientSocket, response.c_str(),response.size(), 0) == -1){
                 std::cerr << "Failed to send UDP response." << std::endl;
                 return 1;
@@ -234,11 +234,14 @@ int main() {
             bool isOverlap = classOverlap(ceIntervals, eeIntervals);
             
             response = ""; 
+            cout << "Found the intersection between the results from server CE and EE:" << endl;
 
             if(isOverlap){
-                response += "Intersection exist between " + CEsend + " and " + EEsend;  
+                cout << "Course intervals were found for " << CEsend << ", " << EEsend << endl;
+                response += "Course intervals were found for " + CEsend + ", " + EEsend;  
             } else {
-                response += "No intersection exist between " + CEsend + " and " + EEsend; 
+                cout << "No Course intervals were found for " << CEsend << ", " << EEsend << endl;
+                response += "No Course intervals were found for " + CEsend + ", " + EEsend; 
             }
             
             if(send(clientSocket, response.c_str(), response.size(), 0) == -1){
@@ -247,11 +250,15 @@ int main() {
             }
 
         } else if(CEsend != "" && EEsend == ""){
+            bool doesNotExist = false;
+            string nameExist = "";
             if(notFoundNames.size() > 0){
+                doesNotExist = true;
                 cout << notFoundNames[0] << " do not exist. Send a reply to the client." << endl;
                 cout << "Found ";
                 for(int i = 0; i < studNames.size(); i++){
                     if(studNames[i] != notFoundNames[0]){
+                        nameExist = studNames[i];
                         cout << studNames[i] << " located at server CE. Send to Server CE" << endl;
                     } 
                 }
@@ -279,20 +286,32 @@ int main() {
                 std::cerr << "Failed to receive UDP data from client 1." << std::endl;
                 return 1; 
             }
-            
             std::string CEresponse1 = CEresponse;
-            
+            cout << "Main Server received from server CE the intersection result using UDP over port " << to_string(MAIN_SERVER_UDP_PORT) << ":" << endl;
+        
+            if(doesNotExist){   
+                CEresponse1 = notFoundNames[0] + " do not exist.\n";
+                CEresponse1 += "No Course intervals were found for " + nameExist;
+                cout << "No Course intervals were found for " << nameExist << endl;
+            } else {
+                cout << CEresponse1 << endl;
+            }
+
             if(send(clientSocket, CEresponse1.c_str(),CEresponse1.size(), 0) == -1){
                 std::cerr << "Failed to send UDP response." << std::endl;
                 return 1;
             }
          
         } else if (EEsend != "" && CEsend == "") {
+            bool doesNotExist = false;
+            string nameExist = "";
             if(notFoundNames.size() > 0){
+                doesNotExist = true;
                 cout << notFoundNames[0] << " do not exist. Send a reply to the client." << endl;
                 cout << "Found ";
                 for(int i = 0; i < studNames.size(); i++){
                     if(studNames[i] != notFoundNames[0]){
+                        nameExist = studNames[i];
                         cout << studNames[i] << " located at server EE. Send to Server EE" << endl;
                     }
                 }
@@ -322,6 +341,16 @@ int main() {
             }
             
             std::string EEresponse1 = EEresponse;
+            cout << "Main Server received from server EE the intersection result using UDP over port " << to_string(MAIN_SERVER_UDP_PORT) << ":" << endl;
+
+            if(doesNotExist){   
+                EEresponse1 = notFoundNames[0] + " do not exist.\n";
+                EEresponse1 += "No Course intervals were found for " + nameExist;
+                cout << "No Course intervals were found for " << nameExist << endl;
+            } else {
+                cout << EEresponse1 << endl;
+            }
+
             if(send(clientSocket, EEresponse1.c_str(),EEresponse1.size(), 0) == -1){
                 std::cerr << "Failed to send UDP response." << std::endl;
                 return 1;

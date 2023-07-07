@@ -12,6 +12,8 @@
 #include  <sys/wait.h>
 #include  <signal.h>
 
+using namespace std;
+
 const int MAIN_SERVER_PORT = 24370; 
 #define MAIN_SERVER_IP "127.0.0.1"
 
@@ -56,23 +58,32 @@ int main() {
         return 1;
     }
 
-
+    cout << "Client is up and running." << endl;
+    bool firstTime = true;
     //Continue asking users for input
     while(1) {
+        if(firstTime){
+           std::cout << "Please enter the usernames to check GroupSync availability" << endl; 
+           firstTime = false;
+        } else {
+            cout << "-----Start a new request-----" << endl;
+            std::cout << "Please enter the usernames to check GroupSync availability" << endl;
+        }
         //Send request to main server
         std::string request;
-        std::cout << "Please enter the usernames to check the common course selection:";
         std::getline(std::cin, request);
         if(request.empty()){
             continue;
         }
 
         send(clientSocket, request.c_str(), request.size(), 0);
+        cout << "Client finished sending the usernames to Main Server." << endl;
 
         // Receive response from main server
         char buffer[1024] = "";
         int bytesRead = read(clientSocket, buffer, 1024);
-        std::cout << "Response from main server: " << buffer << std::endl;
+        std::cout << "Client received the reply from the Main Server using TCP over port " << to_string(clientPort) << endl;
+        cout << buffer << std::endl;
 
     }
 

@@ -100,19 +100,19 @@ int main() {
         std::string name = CEnames;
         std::vector<string> CEvector   = splitString(name, " "); 
 
-        std::string response = " do not exist.";
+        std::string response = "";
 
         if(CEvector.size() == 2){
             std::vector<std::vector<int>> stud1 = data[CEvector[0]];
             std::vector<std::vector<int>> stud2 = data[CEvector[1]];   
             bool isOverlap = classOverlap(stud1, stud2);
-            //response = "Found " + CEvector[0] + "," + CEvector[1] + " located at CE.\n";
 
             if(isOverlap){
                 cout << "Found the intersection result for " << CEvector[0] <<  ", " << CEvector[1] << "." << endl;
-                response = "Main Server received from server CE the intersection result using UDP over port " + to_string(MAIN_SERVER_UDP_PORT) + ".";
+                response = "Course intervals were found for " + CEvector[0] + ", " + CEvector[1] + ".";
             } else {
-                response = "No overlap found between " + CEvector[0] +  ", " + CEvector[1] + ".";
+                cout << "No Course intervals were found for " << CEvector[0] <<  ", " << CEvector[1] << "." << endl;
+                response = "No Course intervals were found for " + CEvector[0] +  ", " + CEvector[1] + ".";
             }
             
             if(sendto(udpSocket, response.c_str(), response.size(), 0,
@@ -123,6 +123,7 @@ int main() {
             }
         } else {
             response = "Found " + CEvector[0] + " located at CE.::";
+            cout << "No Course intervals were found for " << CEvector[0] << "." << endl;
             
             std::string intervals = "["; 
             std::string key = CEvector[0];
