@@ -78,8 +78,8 @@ int main() {
         return 1; 
     }
 
-    std::cout << "ServerCE  finished  sending  a  list  of "
-                 "usernames  to  Main  Server. " << std::endl;  
+    std::cout << "ServerCE finished sending a list of "
+                 "usernames to Main Server. " << std::endl;  
 
 
     while(1){
@@ -94,7 +94,9 @@ int main() {
             std::cerr << "Failed to receive UDP data from client 2." << std::endl;
             return 1; 
         }
-        cout << "Names receieved from main server: " << CEnames << endl;
+        cout << "ServerCE received the usernames from Main Server using UDP over port " 
+                    << to_string(CE_SERVER_UDP_PORT) << "." <<endl;
+        //cout << "Names receieved from main server: " << CEnames << endl;
         std::string name = CEnames;
         std::vector<string> CEvector   = splitString(name, " "); 
 
@@ -104,17 +106,18 @@ int main() {
             std::vector<std::vector<int>> stud1 = data[CEvector[0]];
             std::vector<std::vector<int>> stud2 = data[CEvector[1]];   
             bool isOverlap = classOverlap(stud1, stud2);
-            response = "Found " + CEvector[0] + "," + CEvector[1] + " located at CE.\n";
+            //response = "Found " + CEvector[0] + "," + CEvector[1] + " located at CE.\n";
 
             if(isOverlap){
-                response += "Main Server received from server CE the intersection result using UDP over port (CEPort)";
+                cout << "Found the intersection result for " << CEvector[0] <<  ", " << CEvector[1] << "." << endl;
+                response = "Main Server received from server CE the intersection result using UDP over port " + to_string(MAIN_SERVER_UDP_PORT) + ".";
             } else {
-                response += "No overlap found between these names.";
+                response = "No overlap found between " + CEvector[0] +  ", " + CEvector[1] + ".";
             }
             
             if(sendto(udpSocket, response.c_str(), response.size(), 0,
                 (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0){
-                std::cerr << "Failed to send UDP data." << std::endl; 
+                std::cerr << "Failed to send UDP data." << std::endl;
                 close(udpSocket); 
                 return 1; 
             }
@@ -152,11 +155,8 @@ int main() {
                 close(udpSocket); 
                 return 1; 
             }
-          
         }
-        
-       
-        
+        cout << "ServerCE finished sending the response to Main Server." << endl;  
     }
 
     // Close the UDP Socket

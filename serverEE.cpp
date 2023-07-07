@@ -74,8 +74,8 @@ int main() {
         return 1; 
     }
 
-    std::cout << "ServerEE  finished  sending  a  list  of "
-                 "usernames  to  Main  Server. " << std::endl;  
+    std::cout << "ServerEE finished sending a list of "
+                 "usernames to Main Server. " << std::endl;  
 
 
     while(1){
@@ -90,7 +90,9 @@ int main() {
             std::cerr << "Failed to receive UDP data from client 2." << std::endl;
             return 1; 
         }
-        cout << "Names receieved from main server: " << EEnames << endl;
+        cout << "ServerEE received the usernames from Main Server using UDP over port "
+                            << to_string(EE_SERVER_UDP_PORT) << "." << endl;
+        //cout << "Names receieved from main server: " << EEnames << endl;
         std::string names = EEnames;
         std::vector<string> EEvector   = splitString(names, " "); 
 
@@ -99,12 +101,13 @@ int main() {
             std::vector<std::vector<int>> stud1 = data[EEvector[0]];
             std::vector<std::vector<int>> stud2 = data[EEvector[1]];   
             bool isOverlap = classOverlap(stud1, stud2);
-            response = "Found " + EEvector[0] + "," + EEvector[1] + " located at EE.\n";
+            //response = "Found " + EEvector[0] + "," + EEvector[1] + " located at EE.\n";
 
             if(isOverlap){
-                response += "Main Server received from server EE the intersection result using UDP over port (EEPort)";
+                cout << "Found the intersection result for " << EEvector[0] <<  ", " << EEvector[1] << "." << endl;
+                response = "Main Server received from server EE the intersection result using UDP over port " + to_string(EE_SERVER_UDP_PORT) + ".";
             } else {
-                response += "No overlap found between these names.";
+                response = "No overlap found between " + EEvector[0] +  ", " + EEvector[1] + ".";
             }
             
             if(sendto(udpSocket, response.c_str(), response.size(), 0,
@@ -150,9 +153,8 @@ int main() {
                 close(udpSocket); 
                 return 1; 
             }
-
         }
-       
+        cout << "ServerEE finished sending the response to Main Server." << endl;
     }
 
     // Close the UDP Socket
